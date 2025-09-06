@@ -3,65 +3,63 @@ const path = require("path");
 const { ethers } = require("ethers");
 
 async function runValidationDemo() {
-  // Configuración de conexión (ajusta según tu entorno)
+  // Connection configuration
   const network = "testnet"; // O "mainnet"
-  const contractAddress = "0x..."; // Dirección del contrato DeviceRegistry desplegado
+  const contractAddress = "0xd0876600e82CCAa4aA0ab0Cd8bEa9c74F5b46De3"; // DeviceRegistry contract address
 
-  // Claves privadas (NO COMPARTAS ESTO EN PRODUCCIÓN)
-  const ownerPrivateKey = "0x..."; // Owner del contrato
-  const validatorPrivateKey = "0x..."; // Validador
-  const deviceOwnerPrivateKey = "0x..."; // Dueño del dispositivo
+  // Private keys (DO NOT SHARE THIS IN PRODUCTION)
+  const ownerPrivateKey = "0x..."; // Owner of the contract
+  const validatorPrivateKey = "0x..."; // Validator
+  const deviceOwnerPrivateKey = "0x..."; // Device owner
 
-  console.log("🚀 Iniciando demo de validación de SomniaPulse...");
+  console.log("🚀 Starting SomniaPulse validation demo...");
 
-  // Inicializar SDK para el owner
+  // Initialize SDK for the owner
   const ownerSDK = new SomniaPulseSDK(network, contractAddress);
   await ownerSDK.initializeWallet(ownerPrivateKey);
 
-  // Inicializar SDK para el validador
+  // Initialize SDK for the validator
   const validatorSDK = new SomniaPulseSDK(network, contractAddress);
   await validatorSDK.initializeWallet(validatorPrivateKey);
 
-  // Inicializar SDK para el dueño del dispositivo
+  // Initialize SDK for the device owner
   const deviceOwnerSDK = new SomniaPulseSDK(network, contractAddress);
   await deviceOwnerSDK.initializeWallet(deviceOwnerPrivateKey);
 
-  // 1. Configurar porcentaje de slashing (solo owner)
-  console.log("\n1. Configurando porcentaje de slashing...");
-  await ownerSDK.setSlashingPercentage(10); // 10% de slashing
+  // 1. Configure slashing percentage (only owner)
+  console.log("\n1. Configuring slashing percentage...");
+  await ownerSDK.setSlashingPercentage(10); // 10% of slashing
 
-  // 2. Registrar validador (solo owner)
-  console.log("\n2. Registrando validador...");
+  // 2. Register validator (only owner)
+  console.log("\n2. Registering validator...");
   const validatorAddress = validatorSDK.wallet.address;
-  await ownerSDK.registerValidator(validatorAddress, ethers.utils.parseUnits("50", 18)); // 50 tokens mínimos
+  await ownerSDK.registerValidator(validatorAddress, ethers.utils.parseUnits("50", 18)); // 50 tokens minimum
 
-  // 3. Validador stakea tokens
-  console.log("\n3. Validador stakeando tokens...");
+  // 3. Validator stakes tokens
+  console.log("\n3. Validator stakes tokens...");
   await validatorSDK.stakeValidatorTokens(ethers.utils.parseUnits("100", 18)); // 100 tokens
 
-  // 4. Registrar dispositivo\n  console.log(\"\\n4. Registrando dispositivo...\");\n  const deviceId = \"sensor-malicious-001\";\n  const deviceOwnerAddress = deviceOwnerSDK.wallet.address;\n  await deviceOwnerSDK.registerDevice(deviceId, deviceOwnerAddress);\n\n  // 5. Dispositivo stakea tokens\n  console.log(\"\\n5. Dispositivo stakeando tokens...\");\n  await deviceOwnerSDK.stakeTokens(deviceId, ethers.utils.parseUnits(\"200\", 18)); // 200 tokens\n\n  // 6. Reportar métricas válidas\n  // El dispositivo se verifica automáticamente al reportar la primera métrica\n  console.log(\"\\n6. Reportando métricas válidas...\");\n  await deviceOwnerSDK.reportMetric(deviceId, \"temperature\", 25);\n  await deviceOwnerSDK.reportMetric(deviceId, \"uptime\", 95);\n\n  // 7. Verificar incentivos antes de slashing\n  console.log(\"\\n7. Verificando incentivos antes de slashing...\");\n  await deviceOwnerSDK.getIncentives(deviceId);\n  await deviceOwnerSDK.getStakedAmount(deviceId);
+  // 8. Validator reports malicious behavior
+  console.log("\n8. Validator reporting malicious behavior...");
+  // Create proof of malicious behavior (in a real implementation, this would be an invalid signature or incorrect data)
+  const proof = ethers.utils.toUtf8Bytes("Device reported invalid temperature: 1000°C");
+  await validatorSDK.reportMalBehavior(deviceId, "Invalid temperature", proof);
 
-  // 8. Validador reporta mal comportamiento
-  console.log("\n8. Validador reportando mal comportamiento...");
-  // Crear prueba de mal comportamiento (en una implementación real, esto sería una firma inválida o dato erróneo)
-  const proof = ethers.utils.toUtf8Bytes("Dispositivo reportó temperatura inválida: 1000°C");
-  await validatorSDK.reportMalBehavior(deviceId, "Temperatura inválida", proof);
+  // 9. Owner verifies the report (in a real implementation, this would require analysis of the proof)
+  console.log("\n9. Owner verifying report...");
+  const reportId = 1; // Assuming it's the first report
+  await ownerSDK.verifyReport(reportId, true); // Report valid
 
-  // 9. Owner verifica el reporte (en una implementación real, esto requeriría análisis de la prueba)
-  console.log("\n9. Owner verificando reporte...");
-  const reportId = 1; // Asumimos que es el primer reporte
-  await ownerSDK.verifyReport(reportId, true); // Reporte válido
-
-  // 10. Verificar incentivos y staking después de slashing
-  console.log("\n10. Verificando incentivos y staking después de slashing...");
+  // 10. Verify incentives and staking after slashing
+  console.log("\n10. Verifying incentives and staking after slashing...");
   await deviceOwnerSDK.getIncentives(deviceId);
   await deviceOwnerSDK.getStakedAmount(deviceId);
 
-  // 11. Verificar recompensa del validador
-  console.log("\n11. Verificando recompensa del validador...");
+  // 11. Verify validator reward
+  console.log("\n11. Verifying validator reward...");
   await validatorSDK.getTokenBalance();
 
-  console.log("\n✅ Demo de validación completada!");
+  console.log("\n✅ Validation demo completed!");
 }
 
 runValidationDemo().catch(console.error);
