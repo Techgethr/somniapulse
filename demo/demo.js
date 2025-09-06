@@ -1,5 +1,6 @@
 const SomniaPulseSDK = require("../sdk/index.js");
 const path = require("path");
+const { ethers } = require("ethers");
 
 async function runDemo() {
   // Configuración de conexión (ajusta según tu entorno)
@@ -20,41 +21,44 @@ async function runDemo() {
   // Verificar balance inicial de tokens
   await sdk.getTokenBalance();
 
-  // 1. Registrar un dispositivo con ID personalizado, dirección del propietario y staking opcional
+  // 1. Registrar un dispositivo con ID personalizado y dirección del propietario (sin staking inicial)
   const deviceId = "sensor-001";
   const ownerAddress = "0x..."; // Dirección pública del dispositivo (puede ser la misma que la de la wallet para pruebas)
-  const stakeAmount = ethers.utils.parseUnits("100", 18); // 100 tokens (ajusta según el token)
-  await sdk.registerDevice(deviceId, ownerAddress, stakeAmount);
+  await sdk.registerDevice(deviceId, ownerAddress);
 
-  // 2. Reportar métricas genéricas (con autenticación criptográfica)
+  // 2. Stakear tokens después del registro (staking opcional)
+  const stakeAmount = ethers.utils.parseUnits("100", 18); // 100 tokens (ajusta según el token)
+  await sdk.stakeTokens(deviceId, stakeAmount);
+
+  // 3. Reportar métricas genéricas (con autenticación criptográfica)
   await sdk.reportMetric(deviceId, "temperature", 25); // 25°C
   await sdk.reportMetric(deviceId, "uptime", 98); // 98% uptime
 
-  // 3. Verificar dispositivo
+  // 4. Verificar dispositivo
   await sdk.verifyDevice(deviceId);
 
-  // 4. Consultar estado de verificación
+  // 5. Consultar estado de verificación
   await sdk.isVerified(deviceId);
 
-  // 5. Consultar una métrica específica
+  // 6. Consultar una métrica específica
   await sdk.getMetric(deviceId, "temperature");
 
-  // 6. Consultar incentivos acumulados
+  // 7. Consultar incentivos acumulados
   await sdk.getIncentives(deviceId);
 
-  // 7. Consultar cantidad staked
+  // 8. Consultar cantidad staked
   await sdk.getStakedAmount(deviceId);
 
-  // 8. Verificar balance de tokens después de recibir incentivos
+  // 9. Verificar balance de tokens después de recibir incentivos
   await sdk.getTokenBalance();
 
-  // 9. Listar dispositivos registrados
+  // 10. Listar dispositivos registrados
   await sdk.getDeviceList();
 
-  // 10. Obtener dispositivo por índice
+  // 11. Obtener dispositivo por índice
   await sdk.getDeviceAtIndex(0);
 
-  // 11. Retirar staking (opcional)
+  // 12. Retirar staking (opcional)
   // await sdk.unstakeTokens(deviceId);
 }
 

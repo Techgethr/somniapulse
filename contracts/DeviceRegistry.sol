@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./DeviceIncentives.sol";
+import "./DeviceValidation.sol";
 
-contract DeviceRegistry is DeviceIncentives {
+contract DeviceRegistry is DeviceValidation {
     constructor(address _tokenAddress, bool _stakingRequired, uint256 _minStakeAmount) 
-        DeviceIncentives(_tokenAddress, _stakingRequired, _minStakeAmount) {}
+        DeviceValidation(_tokenAddress, _stakingRequired, _minStakeAmount) {}
 
     function registerDevice(string memory _deviceId, address _owner, uint256 _stakeAmount) public {
         require(!deviceExists[_deviceId], "Device ID already exists");

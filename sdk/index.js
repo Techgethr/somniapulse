@@ -88,10 +88,67 @@ class SomniaPulseSDK {
     return stakedAmount;
   }
 
+  async stakeTokens(deviceId, amount) {
+    // Approve token transfer first
+    const approveTx = await this.tokenContract.approve(this.contractAddress, amount);
+    await approveTx.wait();
+    
+    const tx = await this.contract.stakeTokens(deviceId, amount);
+    await tx.wait();
+    console.log(`Tokens staked for device ${deviceId} with transaction: ${tx.hash}`);
+  }
+
   async unstakeTokens(deviceId) {
     const tx = await this.contract.unstakeTokens(deviceId);
     await tx.wait();
     console.log(`Tokens unstaked for device ${deviceId} with transaction: ${tx.hash}`);
+  }
+
+  // Validator functions
+  async registerValidator(validatorAddress, minStakeAmount) {
+    const tx = await this.contract.registerValidator(validatorAddress, minStakeAmount);
+    await tx.wait();
+    console.log(`Validator ${validatorAddress} registered with transaction: ${tx.hash}`);
+  }
+
+  async stakeValidatorTokens(amount) {
+    // Approve token transfer first
+    const approveTx = await this.tokenContract.approve(this.contractAddress, amount);
+    await approveTx.wait();
+    
+    const tx = await this.contract.stakeValidatorTokens(amount);
+    await tx.wait();
+    console.log(`Validator tokens staked with transaction: ${tx.hash}`);
+  }
+
+  async unstakeValidatorTokens() {
+    const tx = await this.contract.unstakeValidatorTokens();
+    await tx.wait();
+    console.log(`Validator tokens unstaked with transaction: ${tx.hash}`);
+  }
+
+  async reportMalBehavior(deviceId, reason, proof) {
+    const tx = await this.contract.reportMalBehavior(deviceId, reason, proof);
+    await tx.wait();
+    console.log(`Mal behavior reported for device ${deviceId} with transaction: ${tx.hash}`);
+  }
+
+  async verifyReport(reportId, isValid) {
+    const tx = await this.contract.verifyReport(reportId, isValid);
+    await tx.wait();
+    console.log(`Report ${reportId} verified with transaction: ${tx.hash}`);
+  }
+
+  async setSlashingPercentage(percentage) {
+    const tx = await this.contract.setSlashingPercentage(percentage);
+    await tx.wait();
+    console.log(`Slashing percentage set to ${percentage}% with transaction: ${tx.hash}`);
+  }
+
+  async getValidatorInfo(validatorAddress) {
+    const validatorInfo = await this.contract.getValidatorInfo(validatorAddress);
+    console.log(`Validator info:`, validatorInfo);
+    return validatorInfo;
   }
 
   async getTokenBalance() {
