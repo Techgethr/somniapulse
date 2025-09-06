@@ -18,7 +18,7 @@ contract IncentiveConfig is Ownable {
     event MetricConfigUpdated(string metricName, uint256 baseReward, uint256 maxReward, bool proportional, uint256 frequencyLimit, uint256 weight);
     event NetworkSupported(string network);
     
-    constructor(string[] memory supportedNetworks) {
+    constructor(string[] memory supportedNetworks) Ownable(msg.sender) {
         for (uint i = 0; i < supportedNetworks.length; i++) {
             networkSupported[supportedNetworks[i]] = true;
             emit NetworkSupported(supportedNetworks[i]);

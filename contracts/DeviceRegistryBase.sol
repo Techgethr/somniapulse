@@ -29,7 +29,7 @@ contract DeviceRegistryBase is Ownable {
     uint256 public minStakeAmount;
     mapping(address => uint256) public stakerBalances;
 
-    constructor(address _tokenAddress, bool _stakingRequired, uint256 _minStakeAmount) {
+    constructor(address _tokenAddress, bool _stakingRequired, uint256 _minStakeAmount) Ownable(msg.sender) {
         token = IERC20(_tokenAddress);
         stakingRequired = _stakingRequired;
         minStakeAmount = _minStakeAmount;

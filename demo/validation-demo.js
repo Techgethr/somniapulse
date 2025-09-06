@@ -7,7 +7,6 @@ async function runValidationDemo() {
   const network = "testnet"; // O "mainnet"
   const contractAddress = "0x..."; // Dirección del contrato DeviceRegistry desplegado
   const tokenAddress = "0x..."; // Dirección de un token ERC-20 existente
-  const abiPath = path.resolve(__dirname, "../contracts/DeviceRegistry.abi.json");
   const tokenAbiPath = path.resolve(__dirname, "../contracts/IERC20.abi.json");
 
   // Claves privadas (NO COMPARTAS ESTO EN PRODUCCIÓN)
@@ -18,15 +17,15 @@ async function runValidationDemo() {
   console.log("🚀 Iniciando demo de validación de SomniaPulse...");
 
   // Inicializar SDK para el owner
-  const ownerSDK = new SomniaPulseSDK(network, contractAddress, abiPath, tokenAddress, tokenAbiPath);
+  const ownerSDK = new SomniaPulseSDK(network, contractAddress, tokenAddress, tokenAbiPath);
   await ownerSDK.initializeWallet(ownerPrivateKey);
 
   // Inicializar SDK para el validador
-  const validatorSDK = new SomniaPulseSDK(network, contractAddress, abiPath, tokenAddress, tokenAbiPath);
+  const validatorSDK = new SomniaPulseSDK(network, contractAddress, tokenAddress, tokenAbiPath);
   await validatorSDK.initializeWallet(validatorPrivateKey);
 
   // Inicializar SDK para el dueño del dispositivo
-  const deviceOwnerSDK = new SomniaPulseSDK(network, contractAddress, abiPath, tokenAddress, tokenAbiPath);
+  const deviceOwnerSDK = new SomniaPulseSDK(network, contractAddress, tokenAddress, tokenAbiPath);
   await deviceOwnerSDK.initializeWallet(deviceOwnerPrivateKey);
 
   // 1. Configurar porcentaje de slashing (solo owner)

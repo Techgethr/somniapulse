@@ -135,13 +135,17 @@ config.setMetricConfig("default", 5, 5, false, 300, 25);  // Default for other m
 ```javascript
 const SomniaPulseSDK = require("./sdk/index.js");
 
-const sdk = new SomniaPulseSDK(network, contractAddress, abiPath, tokenAddress, tokenAbiPath);
+const sdk = new SomniaPulseSDK(network, contractAddress, tokenAddress, tokenAbiPath);
 await sdk.initializeWallet(privateKey);
 ```
 
-Where `network` is either `"testnet"` or `"mainnet"`, with predefined RPC endpoints:
-- Testnet: `https://dream-rpc.somnia.network/`
-- Mainnet: `https://api.infra.mainnet.somnia.network/`
+Where:
+- `network` is either `"testnet"` or `"mainnet"`
+- `contractAddress` is the address of the deployed DeviceRegistry contract
+- `tokenAddress` is the address of the ERC-20 token contract
+- `tokenAbiPath` is the path to the ERC-20 token ABI file
+
+The SDK now includes the DeviceRegistry ABI internally, so there's no need to provide it as a parameter.
 
 ### Device Management
 ```javascript

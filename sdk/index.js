@@ -1,8 +1,12 @@
 const { ethers } = require("ethers");
 const fs = require("fs");
+const path = require("path");
+
+// Load the DeviceRegistry ABI
+const deviceRegistryABI = require("./pulse_abi.json");
 
 class SomniaPulseSDK {
-  constructor(network, contractAddress, abiPath, tokenAddress, tokenAbiPath) {
+  constructor(network, contractAddress, tokenAddress, tokenAbiPath) {
     // Define network URLs
     const networkUrls = {
       testnet: "https://dream-rpc.somnia.network/",
@@ -16,7 +20,7 @@ class SomniaPulseSDK {
     
     this.provider = new ethers.providers.JsonRpcProvider(networkUrls[network]);
     this.contractAddress = contractAddress;
-    this.abi = JSON.parse(fs.readFileSync(abiPath, "utf8"));
+    this.abi = deviceRegistryABI;
     this.tokenAddress = tokenAddress;
     this.tokenAbi = JSON.parse(fs.readFileSync(tokenAbiPath, "utf8"));
     this.network = network;

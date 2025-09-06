@@ -42,21 +42,10 @@ contract DeviceValidation is DeviceIncentives {
         string memory _network
     ) DeviceIncentives(_tokenAddress, _stakingRequired, _minStakeAmount, _incentiveConfigAddress, _network) {}
     
-    // Modifier para restringir acceso a owner
-    modifier onlyOwner() {
-        require(msg.sender == owner(), "Only contract owner can call this function");
-        _;
-    }
-    
     // Modifier para restringir acceso a validadores
     modifier onlyValidator() {
         require(validators[msg.sender].isActive, "Only registered validators can call this function");
         _;
-    }
-    
-    // Function to get contract owner (assuming it's the deployer)
-    function owner() public view returns (address) {
-        return msg.sender; // Simplified, in practice you might want to store the owner
     }
     
     // Registrar validador (solo owner)
