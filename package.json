@@ -1,7 +1,7 @@
 {
   "name": "somnia-pulse",
   "version": "1.0.0",
-  "description": "DevKit para validar infraestructura física descentralizada sobre Somnia",
+  "description": "DevKit for SomniaPulse, a decentralized infrastructure validation protocol built on Somnia",
   "main": "index.js",
   "scripts": {
     "demo": "node demo/demo.js"

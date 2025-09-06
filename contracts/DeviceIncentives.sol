@@ -57,21 +57,13 @@ contract DeviceIncentives is DeviceMetrics {
         uint256 baseIncentive = 10; // Base reputation bonus
         return (baseIncentive * reputation) / 100; // Up to 100% bonus
     }
-    
-    // Calculate consistency bonus based on reporting frequency
-    function calculateConsistencyBonus(string memory _deviceId, string memory _metricName) internal view returns (uint256) {
-        // For simplicity, we'll use a fixed consistency bonus
-        // In a more complex implementation, this could be based on actual reporting patterns
-        return 5; // Fixed consistency bonus
-    }
 
     function distributeIncentives(string memory _deviceId, string memory _metricName, uint256 _value) internal override {
         // Calculate incentive using the new system
         uint256 baseIncentive = calculateWeightedIncentive(_metricName, _value);
         uint256 reputationBonus = calculateReputationBonus(_deviceId);
-        uint256 consistencyBonus = calculateConsistencyBonus(_deviceId, _metricName);
         
-        uint256 finalIncentive = baseIncentive + reputationBonus + consistencyBonus;
+        uint256 finalIncentive = baseIncentive + reputationBonus;
         
         // If staking is enabled for this device, calculate staking bonus
         if (devices[_deviceId].stakedAmount > 0) {
