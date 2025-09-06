@@ -1,0 +1,15 @@
+{
+  "name": "somnia-pulse",
+  "version": "1.0.0",
+  "description": "DevKit para validar infraestructura física descentralizada sobre Somnia",
+  "main": "index.js",
+  "scripts": {
+    "demo": "node demo/demo.js"
+  },
+  "dependencies": {
+    "ethers": "^5.7.0"
+  },
+  "keywords": ["depin", "somnia", "validation", "sdk"],
+  "author": "SomniaPulse Team",
+  "license": "MIT"
+}
