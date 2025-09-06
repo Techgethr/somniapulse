@@ -20,10 +20,11 @@ async function runDemo() {
   // Verificar balance inicial de tokens
   await sdk.getTokenBalance();
 
-  // 1. Registrar un dispositivo con ID personalizado y dirección del propietario
+  // 1. Registrar un dispositivo con ID personalizado, dirección del propietario y staking opcional
   const deviceId = "sensor-001";
   const ownerAddress = "0x..."; // Dirección pública del dispositivo (puede ser la misma que la de la wallet para pruebas)
-  await sdk.registerDevice(deviceId, ownerAddress);
+  const stakeAmount = ethers.utils.parseUnits("100", 18); // 100 tokens (ajusta según el token)
+  await sdk.registerDevice(deviceId, ownerAddress, stakeAmount);
 
   // 2. Reportar métricas genéricas (con autenticación criptográfica)
   await sdk.reportMetric(deviceId, "temperature", 25); // 25°C
@@ -41,14 +42,20 @@ async function runDemo() {
   // 6. Consultar incentivos acumulados
   await sdk.getIncentives(deviceId);
 
-  // 7. Verificar balance de tokens después de recibir incentivos
+  // 7. Consultar cantidad staked
+  await sdk.getStakedAmount(deviceId);
+
+  // 8. Verificar balance de tokens después de recibir incentivos
   await sdk.getTokenBalance();
 
-  // 8. Listar dispositivos registrados
+  // 9. Listar dispositivos registrados
   await sdk.getDeviceList();
 
-  // 9. Obtener dispositivo por índice
+  // 10. Obtener dispositivo por índice
   await sdk.getDeviceAtIndex(0);
+
+  // 11. Retirar staking (opcional)
+  // await sdk.unstakeTokens(deviceId);
 }
 
 runDemo().catch(console.error);

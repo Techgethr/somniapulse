@@ -16,8 +16,14 @@ class SomniaPulseSDK {
     this.tokenContract = new ethers.Contract(this.tokenAddress, this.tokenAbi, this.wallet);
   }
 
-  async registerDevice(deviceId, ownerAddress) {
-    const tx = await this.contract.registerDevice(deviceId, ownerAddress);
+  async registerDevice(deviceId, ownerAddress, stakeAmount = 0) {
+    // If staking is required or optional with amount, approve token transfer first
+    if (stakeAmount > 0) {
+      const approveTx = await this.tokenContract.approve(this.contractAddress, stakeAmount);
+      await approveTx.wait();
+    }
+    
+    const tx = await this.contract.registerDevice(deviceId, ownerAddress, stakeAmount);
     await tx.wait();
     console.log(`Device ${deviceId} registered with transaction: ${tx.hash}`);
   }
@@ -70,8 +76,22 @@ class SomniaPulseSDK {
 
   async getIncentives(deviceId) {
     const incentives = await this.contract.getIncentives(deviceId);
-    console.log(`Incentives for device ${deviceId}: ${ethers.utils.formatUnits(incentives, await this.tokenContract.decimals())} tokens`);
+    const decimals = await this.tokenContract.decimals();
+    console.log(`Incentives for device ${deviceId}: ${ethers.utils.formatUnits(incentives, decimals)} tokens`);
     return incentives;
+  }
+
+  async getStakedAmount(deviceId) {
+    const stakedAmount = await this.contract.getStakedAmount(deviceId);
+    const decimals = await this.tokenContract.decimals();
+    console.log(`Staked amount for device ${deviceId}: ${ethers.utils.formatUnits(stakedAmount, decimals)} tokens`);
+    return stakedAmount;
+  }
+
+  async unstakeTokens(deviceId) {
+    const tx = await this.contract.unstakeTokens(deviceId);
+    await tx.wait();
+    console.log(`Tokens unstaked for device ${deviceId} with transaction: ${tx.hash}`);
   }
 
   async getTokenBalance() {
