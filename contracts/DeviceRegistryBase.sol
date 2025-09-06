@@ -2,16 +2,20 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract DeviceRegistryBase {
+contract DeviceRegistryBase is Ownable {
     struct Device {
         address owner;
         uint256 lastPing;
         bool verified;
         mapping(string => uint256) metrics;
+        mapping(string => uint256) lastReportTime; // Track last report time per metric
         uint256 incentives;
         uint256 stakedAmount;
         bool isActive;
+        uint256 validReportCount; // For reputation system
+        uint256 totalReportCount; // For reputation system
     }
 
     mapping(string => Device) public devices;

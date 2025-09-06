@@ -4,8 +4,15 @@ pragma solidity ^0.8.0;
 import "./DeviceValidation.sol";
 
 contract DeviceRegistry is DeviceValidation {
-    constructor(address _tokenAddress, bool _stakingRequired, uint256 _minStakeAmount) 
-        DeviceValidation(_tokenAddress, _stakingRequired, _minStakeAmount) {}
+    event DeviceRegistered(string deviceId, address owner);
+
+    constructor(
+        address _tokenAddress, 
+        bool _stakingRequired, 
+        uint256 _minStakeAmount,
+        address _incentiveConfigAddress,
+        string memory _network
+    ) DeviceValidation(_tokenAddress, _stakingRequired, _minStakeAmount, _incentiveConfigAddress, _network) {}
 
     function registerDevice(string memory _deviceId, address _owner, uint256 _stakeAmount) public {
         require(!deviceExists[_deviceId], "Device ID already exists");

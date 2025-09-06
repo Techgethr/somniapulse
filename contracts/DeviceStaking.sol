@@ -2,13 +2,22 @@
 pragma solidity ^0.8.0;
 
 import "./DeviceRegistryBase.sol";
+import "./IncentiveConfig.sol";
 
 contract DeviceStaking is DeviceRegistryBase {
+    IncentiveConfig public incentiveConfig;
+    
     event Staked(string deviceId, address owner, uint256 amount);
     event Unstaked(string deviceId, address owner, uint256 amount);
 
-    constructor(address _tokenAddress, bool _stakingRequired, uint256 _minStakeAmount) 
-        DeviceRegistryBase(_tokenAddress, _stakingRequired, _minStakeAmount) {}
+    constructor(
+        address _tokenAddress, 
+        bool _stakingRequired, 
+        uint256 _minStakeAmount,
+        address _incentiveConfigAddress
+    ) DeviceRegistryBase(_tokenAddress, _stakingRequired, _minStakeAmount) {
+        incentiveConfig = IncentiveConfig(_incentiveConfigAddress);
+    }
 
     function stakeTokens(string memory _deviceId, uint256 _amount) public {
         require(deviceExists[_deviceId], "Device does not exist");

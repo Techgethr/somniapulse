@@ -34,8 +34,13 @@ contract DeviceValidation is DeviceIncentives {
     event DeviceSlashed(string deviceId, uint256 amount);
     event ValidatorRewarded(address validator, uint256 amount);
 
-    constructor(address _tokenAddress, bool _stakingRequired, uint256 _minStakeAmount) 
-        DeviceIncentives(_tokenAddress, _stakingRequired, _minStakeAmount) {}
+    constructor(
+        address _tokenAddress, 
+        bool _stakingRequired, 
+        uint256 _minStakeAmount,
+        address _incentiveConfigAddress,
+        string memory _network
+    ) DeviceIncentives(_tokenAddress, _stakingRequired, _minStakeAmount, _incentiveConfigAddress, _network) {}
     
     // Modifier para restringir acceso a owner
     modifier onlyOwner() {
