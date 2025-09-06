@@ -4,7 +4,7 @@ const { ethers } = require("ethers");
 
 async function runDemo() {
   // Configuración de conexión (ajusta según tu entorno)
-  const providerUrl = "http://127.0.0.1:8545"; // Ejemplo: Ganache
+  const network = "testnet"; // O "mainnet"
   const contractAddress = "0x..."; // Dirección del contrato DeviceRegistry desplegado
   const tokenAddress = "0x..."; // Dirección de un token ERC-20 existente (por ejemplo, DAI, USDC, etc.)
   const abiPath = path.resolve(__dirname, "../contracts/DeviceRegistry.abi.json");
@@ -13,7 +13,7 @@ async function runDemo() {
   // Clave privada de una cuenta de prueba (NO COMPARTAS ESTO EN PRODUCCIÓN)
   const privateKey = "0x...";
 
-  const sdk = new SomniaPulseSDK(providerUrl, contractAddress, abiPath, tokenAddress, tokenAbiPath);
+  const sdk = new SomniaPulseSDK(network, contractAddress, abiPath, tokenAddress, tokenAbiPath);
   await sdk.initializeWallet(privateKey);
 
   console.log("🚀 Iniciando demo de SomniaPulse...");

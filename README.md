@@ -114,9 +114,13 @@ solcjs --abi --bin contracts/DeviceRegistry.sol -o contracts/
 ```javascript
 const SomniaPulseSDK = require("./sdk/index.js");
 
-const sdk = new SomniaPulseSDK(providerUrl, contractAddress, abiPath, tokenAddress, tokenAbiPath);
+const sdk = new SomniaPulseSDK(network, contractAddress, abiPath, tokenAddress, tokenAbiPath);
 await sdk.initializeWallet(privateKey);
 ```
+
+Where `network` is either `"testnet"` or `"mainnet"`, with predefined RPC endpoints:
+- Testnet: `https://dream-rpc.somnia.network/`
+- Mainnet: `https://api.infra.mainnet.somnia.network/`
 
 ### Device Management
 ```javascript

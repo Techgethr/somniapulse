@@ -2,12 +2,24 @@ const { ethers } = require("ethers");
 const fs = require("fs");
 
 class SomniaPulseSDK {
-  constructor(providerUrl, contractAddress, abiPath, tokenAddress, tokenAbiPath) {
-    this.provider = new ethers.providers.JsonRpcProvider(providerUrl);
+  constructor(network, contractAddress, abiPath, tokenAddress, tokenAbiPath) {
+    // Define network URLs
+    const networkUrls = {
+      testnet: "https://dream-rpc.somnia.network/",
+      mainnet: "https://api.infra.mainnet.somnia.network/"
+    };
+    
+    // Validate network parameter
+    if (!networkUrls[network]) {
+      throw new Error("Invalid network. Please use 'testnet' or 'mainnet'.");
+    }
+    
+    this.provider = new ethers.providers.JsonRpcProvider(networkUrls[network]);
     this.contractAddress = contractAddress;
     this.abi = JSON.parse(fs.readFileSync(abiPath, "utf8"));
     this.tokenAddress = tokenAddress;
     this.tokenAbi = JSON.parse(fs.readFileSync(tokenAbiPath, "utf8"));
+    this.network = network;
   }
 
   async initializeWallet(privateKey) {
