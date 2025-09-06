@@ -2,25 +2,38 @@ const { ethers } = require("ethers");
 const fs = require("fs");
 
 class SomniaPulseSDK {
-  constructor(providerUrl, contractAddress, abiPath) {
+  constructor(providerUrl, contractAddress, abiPath, tokenAddress, tokenAbiPath) {
     this.provider = new ethers.providers.JsonRpcProvider(providerUrl);
     this.contractAddress = contractAddress;
     this.abi = JSON.parse(fs.readFileSync(abiPath, "utf8"));
+    this.tokenAddress = tokenAddress;
+    this.tokenAbi = JSON.parse(fs.readFileSync(tokenAbiPath, "utf8"));
   }
 
   async initializeWallet(privateKey) {
     this.wallet = new ethers.Wallet(privateKey, this.provider);
     this.contract = new ethers.Contract(this.contractAddress, this.abi, this.wallet);
+    this.tokenContract = new ethers.Contract(this.tokenAddress, this.tokenAbi, this.wallet);
   }
 
-  async registerDevice(deviceId) {
-    const tx = await this.contract.registerDevice(deviceId);
+  async registerDevice(deviceId, ownerAddress) {
+    const tx = await this.contract.registerDevice(deviceId, ownerAddress);
     await tx.wait();
     console.log(`Device ${deviceId} registered with transaction: ${tx.hash}`);
   }
 
   async reportMetric(deviceId, metricName, value) {
-    const tx = await this.contract.reportMetric(deviceId, metricName, value);
+    // Create the message to sign
+    const message = ethers.utils.solidityKeccak256(
+      ["string", "string", "uint256", "uint256"],
+      [deviceId, metricName, value, (await this.provider.getNetwork()).chainId]
+    );
+    
+    // Sign the message
+    const signature = await this.wallet.signMessage(ethers.utils.arrayify(message));
+    
+    // Report the metric with signature
+    const tx = await this.contract.reportMetric(deviceId, metricName, value, signature);
     await tx.wait();
     console.log(`Metric ${metricName} reported for device ${deviceId} with transaction: ${tx.hash}`);
   }
@@ -41,6 +54,30 @@ class SomniaPulseSDK {
     const value = await this.contract.getMetric(deviceId, metricName);
     console.log(`Metric ${metricName} for device ${deviceId}: ${value}`);
     return value;
+  }
+
+  async getDeviceList() {
+    const deviceList = await this.contract.getDeviceList();
+    console.log(`Registered devices: ${deviceList.join(", ")}`);
+    return deviceList;
+  }
+
+  async getDeviceAtIndex(index) {
+    const deviceId = await this.contract.getDeviceAtIndex(index);
+    console.log(`Device at index ${index}: ${deviceId}`);
+    return deviceId;
+  }
+
+  async getIncentives(deviceId) {
+    const incentives = await this.contract.getIncentives(deviceId);
+    console.log(`Incentives for device ${deviceId}: ${ethers.utils.formatEther(incentives)} SPT`);
+    return incentives;
+  }
+
+  async getTokenBalance() {
+    const balance = await this.tokenContract.balanceOf(this.wallet.address);
+    console.log(`Token balance: ${ethers.utils.formatEther(balance)} SPT`);
+    return balance;
   }
 }
 
