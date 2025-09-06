@@ -1,6 +1,6 @@
 # SomniaPulse DevKit
 
-SomniaPulse is a comprehensive DevKit for building and managing DePIN (Decentralized Physical Infrastructure Networks) on the Somnia network. It provides tools to register devices, report metrics, verify authenticity, incentivize contributions with a configurable system, and validate network quality.
+SomniaPulse is a comprehensive DevKit for building and managing DePIN (Decentralized Physical Infrastructure Networks) on the [Somnia network](https://somnia.network/). It provides tools to register devices, report metrics, verify authenticity, incentivize contributions with a configurable system, and validate network quality.
 
 ## 🧩 Features
 
@@ -8,11 +8,61 @@ SomniaPulse is a comprehensive DevKit for building and managing DePIN (Decentral
 - Generic metric reporting (key-value)
 - Cryptographic authentication for devices
 - Configurable incentive system based on metrics using any ERC-20 token
+- Automatic device verification on first metric report
 - Optional staking system with configurable minimums
 - External validation and slashing mechanisms
 - Modular smart contract architecture
 - JavaScript SDK for easy integration
 - Network-specific incentive configurations
+- Reputation-based incentive bonuses
+
+## 🎯 Use Cases
+
+SomniaPulse can be used in various DePIN scenarios:
+
+### Environmental Monitoring
+- **Weather Stations**: Deploy temperature, humidity, and pressure sensors across a region
+- **Air Quality Monitoring**: Track pollution levels in cities with incentivized reporting
+- **Water Quality Sensors**: Monitor rivers, lakes, and groundwater quality parameters
+
+### IoT Networks
+- **Smart Agriculture**: Soil moisture, light, and temperature sensors for precision farming
+- **Supply Chain Tracking**: Location and condition monitoring for goods in transit
+- **Smart City Infrastructure**: Traffic monitoring, parking sensors, and public utility meters
+
+### Network Infrastructure
+- **WiFi Hotspot Networks**: Incentivize uptime and bandwidth contribution
+- **Blockchain Node Networks**: Reward nodes for maintaining network health and availability
+- **CDN Networks**: Incentivize content caching and delivery performance
+
+### Community Projects
+- **Citizen Science Initiatives**: Engage community members with sensor devices for research
+- **Local Mesh Networks**: Build decentralized communication networks with community participation
+- **Energy Grid Monitoring**: Track renewable energy production and consumption at local level
+
+## 🚀 Opportunities
+
+SomniaPulse creates new opportunities for DePIN development:
+
+### For Developers
+- **Rapid Prototyping**: Quickly build and deploy DePIN networks with minimal setup
+- **Flexible Incentives**: Customize reward systems for specific network requirements
+- **Modular Design**: Extend functionality through contract inheritance and composition
+
+### For Network Operators
+- **Quality Assurance**: Validator system ensures data accuracy and network reliability
+- **Economic Control**: Configure incentive models to match business objectives
+- **Scalable Growth**: Network-specific configurations allow for controlled expansion
+
+### For Device Owners
+- **Passive Income**: Earn tokens for maintaining and operating devices
+- **Reputation Building**: Gain recognition for consistent, high-quality contributions
+- **Flexible Participation**: Choose staking levels based on risk tolerance and investment capacity
+
+### For Validators
+- **Network Security**: Earn rewards for maintaining data integrity
+- **Governance Participation**: Influence network policies and quality standards
+- **Professional Services**: Offer validation services to multiple DePIN networks
 
 ## 📁 Project Structure
 
@@ -29,7 +79,9 @@ SomniaPulse/
 │   └── IncentiveConfig.sol
 │
 ├── sdk/                    # JavaScript SDK
-│   └── index.js
+│   ├── index.js
+│   ├── pulse_abi.json
+│   └── erc20_abi.json
 │
 ├── demo/                   # Example applications
 │   ├── demo.js
@@ -48,11 +100,11 @@ graph TD
     C --> D[(Somnia Blockchain)]
     E[Validators] --> C
     F[ERC-20 Token] --> C
-    C --> G[Incentives Distribution]
-    C --> H[Staking Management]
+    G[IncentiveConfig.sol] --> C
     
     subgraph "Smart Contract Layer"
         C
+        G
     end
     
     subgraph "Device Layer"
@@ -72,8 +124,8 @@ graph TD
 
 1. Clone the repository:
    ```bash
-   git clone <repo-url>
-   cd SomniaPulse
+   git clone https://github.com/Techgethr/somniapulse.git
+   cd somniapulse
    ```
 
 2. Install dependencies:
@@ -86,29 +138,59 @@ graph TD
    npm install @openzeppelin/contracts
    ```
 
+## 🧱 Deploying Smart Contracts
+
+Before using the SDK, you need to deploy the smart contracts to your desired network:
+
+### 1. Deploy IncentiveConfig Contract
+First, deploy the `IncentiveConfig` contract which manages incentive rules for different networks:
+```bash
+# Deploy IncentiveConfig with supported networks (e.g., ["testnet", "mainnet"])
+# This will return the contract address
+```
+
+### 2. Configure Incentive Rules
+Configure the incentive rules for different metric types:
+```javascript
+// Example configuration
+const incentiveConfig = new ethers.Contract(configAddress, incentiveConfigABI, wallet);
+
+// Configure incentives for different metrics
+await incentiveConfig.setMetricConfig("uptime", 100, 100, true, 3600, 100);  // Proportional, hourly limit
+await incentiveConfig.setMetricConfig("temperature", 10, 10, false, 600, 50);  // Fixed, 10 min limit
+await incentiveConfig.setMetricConfig("default", 5, 5, false, 300, 25);  // Default for other metrics
+```
+
+### 3. Deploy DeviceRegistry Contract
+Deploy the main `DeviceRegistry` contract with the required parameters:
+```bash
+# Deploy DeviceRegistry with:
+# - Token address (ERC-20 token for incentives)
+# - Staking requirement (boolean)
+# - Minimum stake amount (if staking required)
+# - IncentiveConfig address
+# - Network name (must match one configured in IncentiveConfig)
+```
+
+### 4. Configure Validators (Optional)
+If using the validation system, register validators:
+```javascript
+// Register validators with minimum staking amounts
+await deviceRegistry.registerValidator(validatorAddress, minStakeAmount);
+```
+
+You can use the testnet version for the first DePIN created with this DevKit to test the system:
+
+- IncentiveConfig: 0x4dA05ddA2F0586327E956548fd3E88a508ba2168
+- DeviceRegistry (network): 0xd0876600e82CCAa4aA0ab0Cd8bEa9c74F5b46De3
+
+_These addresses are from the Somnia testnet_
+
+
 ## 🧱 Compiling Contracts
 
 ```bash
 solcjs --abi --bin contracts/DeviceRegistry.sol -o contracts/
-```
-
-## ⚙️ Configuring Incentives
-
-The new incentive system can be configured for each network:
-
-1. Deploy the `IncentiveConfig` contract with a list of supported networks
-2. Configure metric-specific incentives using `setMetricConfig`
-3. Deploy the main `DeviceRegistry` contract with the incentive config address and network name
-
-Example configuration:
-```solidity
-// Deploy IncentiveConfig
-IncentiveConfig config = new IncentiveConfig(["testnet", "mainnet"]);
-
-// Configure incentives for different metrics
-config.setMetricConfig("uptime", 100, 100, true, 3600, 100);  // Proportional, hourly limit
-config.setMetricConfig("temperature", 10, 10, false, 600, 50);  // Fixed, 10 min limit
-config.setMetricConfig("default", 5, 5, false, 300, 25);  // Default for other metrics
 ```
 
 ## ▶️ Running the Demos
@@ -143,7 +225,7 @@ Where:
 - `network` is either `"testnet"` or `"mainnet"`
 - `contractAddress` is the address of the deployed DeviceRegistry contract
 
-The SDK now includes both the DeviceRegistry ABI and the ERC20 ABI internally, and automatically retrieves the token address from the contract, so there's no need to provide it as a parameter.
+The SDK automatically retrieves the ERC-20 token address from the DeviceRegistry contract, so there's no need to provide it as a parameter. It also includes both the DeviceRegistry ABI and the ERC20 ABI internally.
 
 ### Device Management
 ```javascript
