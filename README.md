@@ -1,17 +1,18 @@
 # SomniaPulse DevKit
 
-SomniaPulse is a comprehensive DevKit for building and managing DePIN (Decentralized Physical Infrastructure Networks) on the Somnia network. It provides tools to register devices, report metrics, verify authenticity, incentivize contributions, and validate network quality.
+SomniaPulse is a comprehensive DevKit for building and managing DePIN (Decentralized Physical Infrastructure Networks) on the Somnia network. It provides tools to register devices, report metrics, verify authenticity, incentivize contributions with a configurable system, and validate network quality.
 
 ## 🧩 Features
 
 - Device registration with custom ID
 - Generic metric reporting (key-value)
 - Cryptographic authentication for devices
-- Incentive system based on metrics using any ERC-20 token
+- Configurable incentive system based on metrics using any ERC-20 token
 - Optional staking system with configurable minimums
 - External validation and slashing mechanisms
 - Modular smart contract architecture
 - JavaScript SDK for easy integration
+- Network-specific incentive configurations
 
 ## 📁 Project Structure
 
@@ -24,7 +25,8 @@ SomniaPulse/
 │   ├── DeviceMetrics.sol
 │   ├── DeviceIncentives.sol
 │   ├── DeviceValidation.sol
-│   └── DeviceRegistry.sol
+│   ├── DeviceRegistry.sol
+│   └── IncentiveConfig.sol
 │
 ├── sdk/                    # JavaScript SDK
 │   └── index.js
@@ -88,6 +90,25 @@ graph TD
 
 ```bash
 solcjs --abi --bin contracts/DeviceRegistry.sol -o contracts/
+```
+
+## ⚙️ Configuring Incentives
+
+The new incentive system can be configured for each network:
+
+1. Deploy the `IncentiveConfig` contract with a list of supported networks
+2. Configure metric-specific incentives using `setMetricConfig`
+3. Deploy the main `DeviceRegistry` contract with the incentive config address and network name
+
+Example configuration:
+```solidity
+// Deploy IncentiveConfig
+IncentiveConfig config = new IncentiveConfig(["testnet", "mainnet"]);
+
+// Configure incentives for different metrics
+config.setMetricConfig("uptime", 100, 100, true, 3600, 100);  // Proportional, hourly limit
+config.setMetricConfig("temperature", 10, 10, false, 600, 50);  // Fixed, 10 min limit
+config.setMetricConfig("default", 5, 5, false, 300, 25);  // Default for other metrics
 ```
 
 ## ▶️ Running the Demos
@@ -195,10 +216,13 @@ await sdk.setSlashingPercentage(10); // 10%
 
 ### DeviceRegistry.sol (Main Contract)
 
+#### Constructor
+- `DeviceRegistry(address _tokenAddress, bool _stakingRequired, uint256 _minStakeAmount, address _incentiveConfigAddress, string memory _network)` - Initialize the contract with token, staking configuration, incentive configuration, and network
+
 #### Device Management
 - `registerDevice(string memory _deviceId, address _owner, uint256 _stakeAmount)` - Register a new device
 - `stakeTokens(string memory _deviceId, uint256 _amount)` - Stake tokens for a device
-- `unstakeTokens(string memory _deviceId)` - Unstake tokens from a device
+- `unstakeTokens(string memory _deviceId)` - Unstage tokens from a device
 - `verifyDevice(string memory _deviceId)` - Verify a device
 - `getDeviceList() returns (string[] memory)` - Get list of all registered devices
 - `getDeviceAtIndex(uint256 index) returns (string memory)` - Get device by index
@@ -213,14 +237,34 @@ await sdk.setSlashingPercentage(10); // 10%
 - `minStakeAmount() returns (uint256)` - Get minimum staking amount
 - `getStakedAmount(string memory _deviceId) returns (uint256)` - Get staked amount for device
 
+### DeviceStaking.sol (Staking Contract)
+
+#### Constructor
+- `DeviceStaking(address _tokenAddress, bool _stakingRequired, uint256 _minStakeAmount, address _incentiveConfigAddress)` - Initialize the contract with token, staking configuration, and incentive configuration
+
+#### Staking Functions
+- `stakeTokens(string memory _deviceId, uint256 _amount)` - Stake tokens for a device
+- `unstakeTokens(string memory _deviceId)` - Unstake tokens from a device
+- `checkStakingRequirement(string memory _deviceId) returns (bool)` - Check if staking requirements are met
+
 #### Incentives
 - `getIncentives(string memory _deviceId) returns (uint256)` - Get incentives for device
 - `distributeIncentives(string memory _deviceId, string memory _metricName, uint256 _value)` - Internal function to distribute incentives
 
+### DeviceIncentives.sol (Incentive Contract)
+
+#### Constructor
+- `DeviceIncentives(address _tokenAddress, bool _stakingRequired, uint256 _minStakeAmount, address _incentiveConfigAddress, string memory _network)` - Initialize the contract with token, staking configuration, incentive configuration, and network
+
+#### Incentive Functions
+- `calculateWeightedIncentive(string memory _metricName, uint256 _value) returns (uint256)` - Calculate weighted incentive based on metric configuration
+- `calculateReputationBonus(string memory _deviceId) returns (uint256)` - Calculate reputation bonus based on device's validation history
+- `calculateConsistencyBonus(string memory _deviceId, string memory _metricName) returns (uint256)` - Calculate consistency bonus based on reporting frequency
+
 #### Validation (Owner Functions)
 - `registerValidator(address _validator, uint256 _minStakeAmount)` - Register a new validator
 - `verifyReport(uint256 _reportId, bool _isValid)` - Verify a malbehavior report
-- `setSlashingPercentage(uint256 _percentage)` - Set slashing percentage (0-100)
+- `setSlashingPercentage(uint256 _percentage)` - Set slashing percentage (0-100%)
 - `getValidatorInfo(address _validator) returns (Validator memory)` - Get validator information
 
 #### Validator Functions
@@ -231,7 +275,16 @@ await sdk.setSlashingPercentage(10); // 10%
 #### Internal Functions
 - `recoverSigner(bytes32 ethSignedMessageHash, bytes memory signature) returns (address)` - Recover signer from signature
 - `splitSignature(bytes memory sig) returns (bytes32 r, bytes32 s, uint8 v)` - Split signature into components
-- `calculateBaseIncentive(string memory _metricName, uint256 _value) returns (uint256)` - Calculate base incentive
+
+### IncentiveConfig.sol (Configuration Contract)
+
+#### Constructor
+- `IncentiveConfig(string[] memory supportedNetworks)` - Initialize the contract with a list of supported networks
+
+#### Configuration Management
+- `setMetricConfig(string memory _metricName, uint256 _baseReward, uint256 _maxReward, bool _proportional, uint256 _frequencyLimit, uint256 _weight)` - Configure incentive rules for a metric type
+- `getMetricConfig(string memory _metricName) returns (MetricConfig memory)` - Get configuration for a metric type
+- `isNetworkSupported(string memory _network) returns (bool)` - Check if a network is supported
 
 ## 🧮 Staking and Validation System
 
@@ -252,6 +305,28 @@ await sdk.setSlashingPercentage(10); // 10%
 - **Incentive-Based Slashing**: If no staking, slash from accumulated incentives
 - **Configurable Percentage**: Owner sets slashing percentage (0-100%)
 - **Validator Rewards**: Valid validators receive slashed amounts as rewards
+
+## 💰 Incentive System
+
+The improved incentive system is now more flexible and adaptable to different networks:
+
+### IncentiveConfig.sol
+A new contract that allows network-specific configuration of incentives:
+- **Metric-specific rewards**: Different rewards for different metric types
+- **Proportional vs Fixed rewards**: Choose between proportional rewards (based on value) or fixed rewards
+- **Frequency limits**: Prevent abuse by limiting how often metrics can be reported
+- **Weighting system**: Assign different weights to different metrics
+- **Network-specific configurations**: Each network can have its own incentive rules
+
+### Incentive Calculation
+The new system calculates incentives using multiple factors:
+1. **Base Incentive**: Configured reward for each metric type
+2. **Reputation Bonus**: Based on the device's validation history
+3. **Consistency Bonus**: Rewards for consistent reporting
+4. **Staking Bonus**: Additional rewards for staked devices
+
+### Network Adaptability
+Each network (testnet, mainnet) can have its own incentive configuration, making the system adaptable to different use cases and economic models.
 
 ## 🏗️ Modular Architecture
 
@@ -278,6 +353,7 @@ Each contract handles specific functionality:
 - **DeviceIncentives**: Incentive distribution system
 - **DeviceValidation**: External validation and slashing
 - **DeviceRegistry**: Main contract that inherits all functionality
+- **IncentiveConfig**: Configuration contract for network-specific incentive rules
 
 ## 📜 License
 
