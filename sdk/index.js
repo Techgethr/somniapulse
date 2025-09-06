@@ -13,16 +13,16 @@ class SomniaPulseSDK {
     this.contract = new ethers.Contract(this.contractAddress, this.abi, this.wallet);
   }
 
-  async registerDevice(location) {
-    const tx = await this.contract.registerDevice(location);
+  async registerDevice(deviceId) {
+    const tx = await this.contract.registerDevice(deviceId);
     await tx.wait();
-    console.log(`Device registered with transaction: ${tx.hash}`);
+    console.log(`Device ${deviceId} registered with transaction: ${tx.hash}`);
   }
 
-  async reportMetrics(deviceId, uptime) {
-    const tx = await this.contract.reportMetrics(deviceId, uptime);
+  async reportMetric(deviceId, metricName, value) {
+    const tx = await this.contract.reportMetric(deviceId, metricName, value);
     await tx.wait();
-    console.log(`Metrics reported for device ${deviceId} with transaction: ${tx.hash}`);
+    console.log(`Metric ${metricName} reported for device ${deviceId} with transaction: ${tx.hash}`);
   }
 
   async verifyDevice(deviceId) {
@@ -35,6 +35,12 @@ class SomniaPulseSDK {
     const verified = await this.contract.isVerified(deviceId);
     console.log(`Device ${deviceId} verified status: ${verified}`);
     return verified;
+  }
+
+  async getMetric(deviceId, metricName) {
+    const value = await this.contract.getMetric(deviceId, metricName);
+    console.log(`Metric ${metricName} for device ${deviceId}: ${value}`);
+    return value;
   }
 }
 

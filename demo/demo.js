@@ -15,17 +15,22 @@ async function runDemo() {
 
   console.log("🚀 Iniciando demo de SomniaPulse...");
 
-  // 1. Registrar un dispositivo
-  await sdk.registerDevice("40.7128,-74.0060"); // Coordenadas de Nueva York
+  // 1. Registrar un dispositivo con ID personalizado
+  const deviceId = "sensor-001";
+  await sdk.registerDevice(deviceId);
 
-  // 2. Reportar métricas
-  await sdk.reportMetrics(1, 98); // 98% uptime
+  // 2. Reportar métricas genéricas
+  await sdk.reportMetric(deviceId, "temperature", 25); // 25°C
+  await sdk.reportMetric(deviceId, "uptime", 98); // 98% uptime
 
   // 3. Verificar dispositivo
-  await sdk.verifyDevice(1);
+  await sdk.verifyDevice(deviceId);
 
   // 4. Consultar estado de verificación
-  await sdk.isVerified(1);
+  await sdk.isVerified(deviceId);
+
+  // 5. Consultar una métrica específica
+  await sdk.getMetric(deviceId, "temperature");
 }
 
 runDemo().catch(console.error);
