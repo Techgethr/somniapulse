@@ -4,9 +4,11 @@ const path = require("path");
 
 // Load the DeviceRegistry ABI
 const deviceRegistryABI = require("./pulse_abi.json");
+// Load the ERC20 ABI
+const erc20ABI = require("./erc20_abi.json");
 
 class SomniaPulseSDK {
-  constructor(network, contractAddress, tokenAddress, tokenAbiPath) {
+  constructor(network, contractAddress) {
     // Define network URLs
     const networkUrls = {
       testnet: "https://dream-rpc.somnia.network/",
@@ -21,14 +23,16 @@ class SomniaPulseSDK {
     this.provider = new ethers.providers.JsonRpcProvider(networkUrls[network]);
     this.contractAddress = contractAddress;
     this.abi = deviceRegistryABI;
-    this.tokenAddress = tokenAddress;
-    this.tokenAbi = JSON.parse(fs.readFileSync(tokenAbiPath, "utf8"));
+    this.tokenAbi = erc20ABI;
     this.network = network;
   }
 
   async initializeWallet(privateKey) {
     this.wallet = new ethers.Wallet(privateKey, this.provider);
     this.contract = new ethers.Contract(this.contractAddress, this.abi, this.wallet);
+    
+    // Retrieve token address from the contract
+    this.tokenAddress = await this.contract.token();
     this.tokenContract = new ethers.Contract(this.tokenAddress, this.tokenAbi, this.wallet);
   }
 

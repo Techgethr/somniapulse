@@ -135,17 +135,15 @@ config.setMetricConfig("default", 5, 5, false, 300, 25);  // Default for other m
 ```javascript
 const SomniaPulseSDK = require("./sdk/index.js");
 
-const sdk = new SomniaPulseSDK(network, contractAddress, tokenAddress, tokenAbiPath);
+const sdk = new SomniaPulseSDK(network, contractAddress);
 await sdk.initializeWallet(privateKey);
 ```
 
 Where:
 - `network` is either `"testnet"` or `"mainnet"`
 - `contractAddress` is the address of the deployed DeviceRegistry contract
-- `tokenAddress` is the address of the ERC-20 token contract
-- `tokenAbiPath` is the path to the ERC-20 token ABI file
 
-The SDK now includes the DeviceRegistry ABI internally, so there's no need to provide it as a parameter.
+The SDK now includes both the DeviceRegistry ABI and the ERC20 ABI internally, and automatically retrieves the token address from the contract, so there's no need to provide it as a parameter.
 
 ### Device Management
 ```javascript

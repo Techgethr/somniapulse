@@ -6,13 +6,11 @@ async function runDemo() {
   // Configuración de conexión (ajusta según tu entorno)
   const network = "testnet"; // O "mainnet"
   const contractAddress = "0x..."; // Dirección del contrato DeviceRegistry desplegado
-  const tokenAddress = "0x..."; // Dirección de un token ERC-20 existente (por ejemplo, DAI, USDC, etc.)
-  const tokenAbiPath = path.resolve(__dirname, "../contracts/IERC20.abi.json"); // ABI estándar de ERC-20
 
   // Clave privada de una cuenta de prueba (NO COMPARTAS ESTO EN PRODUCCIÓN)
   const privateKey = "0x...";
 
-  const sdk = new SomniaPulseSDK(network, contractAddress, tokenAddress, tokenAbiPath);
+  const sdk = new SomniaPulseSDK(network, contractAddress);
   await sdk.initializeWallet(privateKey);
 
   console.log("🚀 Iniciando demo de SomniaPulse...");
