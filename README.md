@@ -159,10 +159,8 @@ await sdk.stakeTokens("sensor-001", amount);
 await sdk.unstakeTokens("sensor-001");
 
 // Report metric with cryptographic authentication
+// Device is automatically verified when first metric is reported
 await sdk.reportMetric("sensor-001", "temperature", 25);
-
-// Verify device
-await sdk.verifyDevice("sensor-001");
 ```
 
 ### Query Functions
@@ -226,8 +224,7 @@ await sdk.setSlashingPercentage(10); // 10%
 #### Device Management
 - `registerDevice(string memory _deviceId, address _owner, uint256 _stakeAmount)` - Register a new device
 - `stakeTokens(string memory _deviceId, uint256 _amount)` - Stake tokens for a device
-- `unstakeTokens(string memory _deviceId)` - Unstage tokens from a device
-- `verifyDevice(string memory _deviceId)` - Verify a device
+- `unstakeTokens(string memory _deviceId)` - Unstake tokens from a device
 - `getDeviceList() returns (string[] memory)` - Get list of all registered devices
 - `getDeviceAtIndex(uint256 index) returns (string memory)` - Get device by index
 
@@ -303,6 +300,9 @@ await sdk.setSlashingPercentage(10); // 10%
 3. Validators report malbehavior with cryptographic proof
 4. Owner verifies reports and executes slashing if valid
 5. Valid validators receive rewards from slashed amounts
+
+### Device Verification
+Devices are automatically verified when they report their first metric, eliminating the need for a separate verification step.
 
 ### Slashing Mechanism
 - **Staking-Based Slashing**: If device has staked tokens, slash from staking balance

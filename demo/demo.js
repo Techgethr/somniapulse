@@ -30,34 +30,32 @@ async function runDemo() {
   await sdk.stakeTokens(deviceId, stakeAmount);
 
   // 3. Reportar métricas genéricas (con autenticación criptográfica)
+  // El dispositivo se verifica automáticamente al reportar la primera métrica
   await sdk.reportMetric(deviceId, "temperature", 25); // 25°C
   await sdk.reportMetric(deviceId, "uptime", 98); // 98% uptime
 
-  // 4. Verificar dispositivo
-  await sdk.verifyDevice(deviceId);
-
-  // 5. Consultar estado de verificación
+  // 4. Consultar estado de verificación (el dispositivo ya está verificado)
   await sdk.isVerified(deviceId);
 
-  // 6. Consultar una métrica específica
+  // 5. Consultar una métrica específica
   await sdk.getMetric(deviceId, "temperature");
 
-  // 7. Consultar incentivos acumulados
+  // 6. Consultar incentivos acumulados
   await sdk.getIncentives(deviceId);
 
-  // 8. Consultar cantidad staked
+  // 7. Consultar cantidad staked
   await sdk.getStakedAmount(deviceId);
 
-  // 9. Verificar balance de tokens después de recibir incentivos
+  // 8. Verificar balance de tokens después de recibir incentivos
   await sdk.getTokenBalance();
 
-  // 10. Listar dispositivos registrados
+  // 9. Listar dispositivos registrados
   await sdk.getDeviceList();
 
-  // 11. Obtener dispositivo por índice
+  // 10. Obtener dispositivo por índice
   await sdk.getDeviceAtIndex(0);
 
-  // 12. Retirar staking (opcional)
+  // 11. Retirar staking (opcional)
   // await sdk.unstakeTokens(deviceId);
 }
 

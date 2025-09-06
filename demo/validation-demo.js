@@ -41,25 +41,7 @@ async function runValidationDemo() {
   console.log("\n3. Validador stakeando tokens...");
   await validatorSDK.stakeValidatorTokens(ethers.utils.parseUnits("100", 18)); // 100 tokens
 
-  // 4. Registrar dispositivo
-  console.log("\n4. Registrando dispositivo...");
-  const deviceId = "sensor-malicious-001";
-  const deviceOwnerAddress = deviceOwnerSDK.wallet.address;
-  await deviceOwnerSDK.registerDevice(deviceId, deviceOwnerAddress);
-
-  // 5. Dispositivo stakea tokens
-  console.log("\n5. Dispositivo stakeando tokens...");
-  await deviceOwnerSDK.stakeTokens(deviceId, ethers.utils.parseUnits("200", 18)); // 200 tokens
-
-  // 6. Reportar métricas válidas
-  console.log("\n6. Reportando métricas válidas...");
-  await deviceOwnerSDK.reportMetric(deviceId, "temperature", 25);
-  await deviceOwnerSDK.reportMetric(deviceId, "uptime", 95);
-
-  // 7. Verificar incentivos antes de slashing
-  console.log("\n7. Verificando incentivos antes de slashing...");
-  await deviceOwnerSDK.getIncentives(deviceId);
-  await deviceOwnerSDK.getStakedAmount(deviceId);
+  // 4. Registrar dispositivo\n  console.log(\"\\n4. Registrando dispositivo...\");\n  const deviceId = \"sensor-malicious-001\";\n  const deviceOwnerAddress = deviceOwnerSDK.wallet.address;\n  await deviceOwnerSDK.registerDevice(deviceId, deviceOwnerAddress);\n\n  // 5. Dispositivo stakea tokens\n  console.log(\"\\n5. Dispositivo stakeando tokens...\");\n  await deviceOwnerSDK.stakeTokens(deviceId, ethers.utils.parseUnits(\"200\", 18)); // 200 tokens\n\n  // 6. Reportar métricas válidas\n  // El dispositivo se verifica automáticamente al reportar la primera métrica\n  console.log(\"\\n6. Reportando métricas válidas...\");\n  await deviceOwnerSDK.reportMetric(deviceId, \"temperature\", 25);\n  await deviceOwnerSDK.reportMetric(deviceId, \"uptime\", 95);\n\n  // 7. Verificar incentivos antes de slashing\n  console.log(\"\\n7. Verificando incentivos antes de slashing...\");\n  await deviceOwnerSDK.getIncentives(deviceId);\n  await deviceOwnerSDK.getStakedAmount(deviceId);
 
   // 8. Validador reporta mal comportamiento
   console.log("\n8. Validador reportando mal comportamiento...");

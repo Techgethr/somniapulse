@@ -42,6 +42,12 @@ contract DeviceMetrics is DeviceStaking {
         // Verify the signer is the device owner
         require(signer == devices[_deviceId].owner, "Invalid signature");
         
+        // Automatically verify the device on first metric report
+        if (!devices[_deviceId].verified) {
+            devices[_deviceId].verified = true;
+            emit DeviceVerified(_deviceId);
+        }
+        
         devices[_deviceId].metrics[_metricName] = _value;
         devices[_deviceId].lastPing = block.timestamp;
         devices[_deviceId].lastReportTime[_metricName] = block.timestamp;
@@ -62,12 +68,6 @@ contract DeviceMetrics is DeviceStaking {
     function distributeIncentives(string memory _deviceId, string memory _metricName, uint256 _value) internal virtual {
         // Base implementation does nothing
         // Will be overridden in DeviceIncentives
-    }
-
-    function verifyDevice(string memory _deviceId) public {
-        require(deviceExists[_deviceId], "Device does not exist");
-        devices[_deviceId].verified = true;
-        emit DeviceVerified(_deviceId);
     }
 
     function isVerified(string memory _deviceId) public view returns (bool) {
