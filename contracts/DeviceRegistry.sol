@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./IncentiveToken.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract DeviceRegistry {
     struct Device {
@@ -16,7 +16,7 @@ contract DeviceRegistry {
     mapping(string => bool) public deviceExists;
     string[] public deviceList;
     uint256 public deviceCount;
-    IncentiveToken public token;
+    IERC20 public token;
 
     event DeviceRegistered(string deviceId, address owner);
     event MetricsReported(string deviceId, string metricName, uint256 value);
@@ -24,7 +24,7 @@ contract DeviceRegistry {
     event IncentivesDistributed(string deviceId, uint256 amount);
 
     constructor(address _tokenAddress) {
-        token = IncentiveToken(_tokenAddress);
+        token = IERC20(_tokenAddress);
     }
 
     function registerDevice(string memory _deviceId, address _owner) public {
@@ -103,7 +103,7 @@ contract DeviceRegistry {
     // Simple incentive calculation - can be made more complex
     function calculateIncentive(string memory _metricName, uint256 _value) internal pure returns (uint256) {
         if (keccak256(abi.encodePacked(_metricName)) == keccak256(abi.encodePacked("uptime"))) {
-            // For uptime, incentive is proportional to value (max 100 SPT for 100% uptime)
+            // For uptime, incentive is proportional to value (max 100 tokens for 100% uptime)
             return (_value * 100) / 100;
         } else if (keccak256(abi.encodePacked(_metricName)) == keccak256(abi.encodePacked("temperature"))) {
             // For temperature, a fixed incentive for reporting

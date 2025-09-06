@@ -70,13 +70,14 @@ class SomniaPulseSDK {
 
   async getIncentives(deviceId) {
     const incentives = await this.contract.getIncentives(deviceId);
-    console.log(`Incentives for device ${deviceId}: ${ethers.utils.formatEther(incentives)} SPT`);
+    console.log(`Incentives for device ${deviceId}: ${ethers.utils.formatUnits(incentives, await this.tokenContract.decimals())} tokens`);
     return incentives;
   }
 
   async getTokenBalance() {
     const balance = await this.tokenContract.balanceOf(this.wallet.address);
-    console.log(`Token balance: ${ethers.utils.formatEther(balance)} SPT`);
+    const decimals = await this.tokenContract.decimals();
+    console.log(`Token balance: ${ethers.utils.formatUnits(balance, decimals)} tokens`);
     return balance;
   }
 }
